@@ -4,34 +4,46 @@ import time
 q = 1
 arr = []
 
+memo = {}
+
+def _fib(k):
+    if k == 0:
+        return (0, 1)
+    
+    if k in memo:
+        return memo[k]
+    
+    a, b = _fib(k >> 1)
+    c = (a * ((b << 1) - a)) % q    
+    d = (a * a + b * b) % q
+    
+    if k & 1:
+        res = (d, (c + d) % q)
+    else:
+        res = (c, d) 
+    memo[k] = res
+    return res
+
 def fibonacci(n):
-    a, b = 0, 1
-    for _ in range(n):
-        a, b = b, a+b
-        a %= q
-        b %= q
-    return a
+    if n <= 1:
+        return n % q
+    return _fib(n)[0]
 
 def func(bounds):
-    arr_tmp = []
     start, end = bounds
     
-    for i in range(start, end):
-        res = fibonacci(arr[i])
-        arr_tmp.append(res)
-    
-    return arr_tmp
+    return [fibonacci(arr[i]) for i in range(start, end)]
 
 def MAIN(input_file_path):
     global arr, q
 
     with open(input_file_path, "r") as f:
-        first_line = f.readline().split()
+        data = f.read().split()
 
-        n = int(first_line[0])
-        q = int(first_line[1])
+        n = int(data[0])
+        q = int(data[1])
 
-        arr = [int(f.readline()) for _ in range(n)]
+        arr = [int(x) for x in data[2:]]
 
     num_cores = 2
     chunk_size = (n + num_cores - 1) // num_cores
@@ -54,7 +66,12 @@ def MAIN(input_file_path):
     
 if __name__ == "__main__":
     start = time.perf_counter()
-    print(MAIN("input.txt"))
+    # print(MAIN("test1_basic.txt"))
+    print(MAIN("test2_maxN_smallA.txt"))
+    # print(MAIN("test3_smallN_maxA.txt"))
+    # print(MAIN("test4_ultimate.txt"))
+    # print(MAIN("test5_edge_cases.txt"))
+
 
     end = time.perf_counter()
     print("Thoi gian chay: ", end - start)
